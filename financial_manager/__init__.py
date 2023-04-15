@@ -1,4 +1,4 @@
-"""Top-level package for finance_manager"""
+"""Top-level package for financial_manager"""
 __app_name__ = "financial_manager"
 __version__ = "0.10"
 
