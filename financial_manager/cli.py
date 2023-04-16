@@ -1,6 +1,12 @@
 import typer
+from config import Config
 from typing import Optional
-from financial_manager import __app_name__, __version__
+from financial_manager import (
+    __app_name__,
+    __version__,
+    ERRORS,
+    database
+)
 
 app = typer.Typer()
 
@@ -20,3 +26,24 @@ def main(version: Optional[bool] = typer.Option(
     callback=_version_callback, is_eager=True
 )) -> None:
     return
+
+@app.command()
+def init(
+        db_path: str = typer.Option(
+        Config.SQLALCHEMY_DATABASE_URI,
+        "--db-path",
+        "-db",
+        prompt = "Use default database location? Tap [Enter] to use default location. Otherwise, enter custom location.\n",
+    )
+) -> None:
+    """Initialize the to-do database."""
+
+    status_code = database.init_database(db_path)
+    if status_code != 0:
+        typer.secho(
+            f'Creating Database file failed with "{ERRORS[status_code]}"',
+            fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+    else:
+        typer.secho(f"The finance cli database is {db_path}", fg=typer.colors.GREEN)
