@@ -7,6 +7,6 @@ def init_database(db_path: str) -> int:
         engine = sql.create_engine(db_path)
         models.Base.metadata.create_all(engine)
         return SUCCESS
-    except OSError as e:
+    except Exception as e:
         return DB_WRITE_ERR
 
