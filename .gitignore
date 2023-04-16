@@ -155,6 +155,7 @@ cython_debug/
 # sensitive data
 ._finance.json
 config.ini
+test_connection.py
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore

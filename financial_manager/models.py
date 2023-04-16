@@ -22,7 +22,7 @@ class Base(DeclarativeBase):
 
 class User(Base):
     __tablename__ = "user"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String)
     email: Mapped[str] = mapped_column(String)
 
@@ -37,7 +37,7 @@ class User(Base):
 
 class Category(Base):
     __tablename__ = "category"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String)
 
     transactions: Mapped[list["Transaction"] | None] = relationship(back_populates = "category")
@@ -50,7 +50,7 @@ class Category(Base):
 
 class Transaction(Base):
     __tablename__ = "transaction_master"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     date: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     amount: Mapped[float ]= mapped_column(Float, default = 0.0)
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), nullable=False)
