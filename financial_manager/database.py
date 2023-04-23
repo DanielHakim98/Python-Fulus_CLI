@@ -15,8 +15,8 @@ def create_user(db_path: str, name: str, email: str) -> int:
     """Create a new user from the given name"""
     try:
         engine = sql.create_engine(db_path)
-        query = """
-            INSERT INTO user (name, email)
+        query = f"""
+            INSERT INTO {models.User.__tablename__} (name, email)
             VALUES (:name, :email)
         """
         with Session(engine) as session:
