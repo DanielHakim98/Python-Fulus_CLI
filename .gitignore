@@ -155,7 +155,7 @@ cython_debug/
 # sensitive data
 ._finance.json
 config.ini
-test_connection.py
+test.py
 financial_manager.db
 
 # PyCharm
