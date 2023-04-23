@@ -85,5 +85,3 @@ def convert_to_datetime(date:str)-> datetime | int:
         split = date.split('-')
         return datetime(split[0],split[1],split[2])
     return FILE_ERR
-
-print(Base.metadata.tables)
