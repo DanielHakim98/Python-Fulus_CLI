@@ -10,8 +10,6 @@ from financial_manager import (
 
 app = typer.Typer()
 
-
-@app.command()
 def _version_callback(value: bool) -> None:
     if value:
         print(f"{__app_name__} v{__version__}")
@@ -47,3 +45,23 @@ def init(
         raise typer.Exit(1)
     else:
         typer.secho(f"The finance cli database is {db_path}", fg=typer.colors.GREEN)
+
+@app.command()
+def create_user(
+    username: str = typer.Argument(..., help="The name of the user to be created"),
+    email: str = typer.Argument(..., help="The email of the user")
+) -> None:
+    """Create a new user"""
+    status_code = database.create_user(
+        Config.SQLALCHEMY_DATABASE_URI,
+        username,
+        email
+    )
+    if status_code != 0:
+        typer.secho(
+            f"User can't be created. Error {ERRORS[status_code]}",
+            fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+    else:
+        typer.secho(f"User '{username}' has been created", fg=typer.colors.GREEN)

@@ -23,7 +23,7 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "user"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String)
+    name: Mapped[str] = mapped_column(String, primary_key=True)
     email: Mapped[str] = mapped_column(String)
 
     transactions: Mapped[list["Transaction"] | None] = relationship(back_populates = "user")

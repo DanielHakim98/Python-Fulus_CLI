@@ -1,4 +1,5 @@
 import sqlalchemy as sql
+from sqlalchemy.orm import Session
 from financial_manager import models, SUCCESS, DB_WRITE_ERR
 
 def init_database(db_path: str) -> int:
@@ -10,3 +11,18 @@ def init_database(db_path: str) -> int:
     except Exception as e:
         return DB_WRITE_ERR
 
+def create_user(db_path: str, name: str, email: str) -> int:
+    """Create a new user from the given name"""
+    try:
+        engine = sql.create_engine(db_path)
+        query = """
+            INSERT INTO user (name, email)
+            VALUES (:name, :email)
+        """
+        with Session(engine) as session:
+            session.execute(sql.text(query), [{"name": name, "email": email}])
+            session.commit()
+        return SUCCESS
+
+    except Exception as e:
+        return DB_WRITE_ERR
