@@ -54,3 +54,15 @@ def test_remove_user():
     assert result.exit_code == 0
     assert f"User '{USERNAME}' has been removed" in result.stdout
     mocked_remove_user.assert_called_once_with(db_path,USERNAME,EMAIL)
+
+def test_list_users():
+    db_path = Config.SQLALCHEMY_DATABASE_URI
+    mocked_list_users = Mock(return_value=0)
+    with patch("financial_manager.database.list_users", mocked_list_users):
+        result = runner.invoke(
+            cli.app,
+            ["list-users"],
+            env={"SQLALCHEMY_DATABASE_URI":db_path}
+        )
+    assert result.exit_code == 0
+    mocked_list_users.assert_called_once_with(db_path)

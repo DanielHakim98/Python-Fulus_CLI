@@ -44,3 +44,5 @@ def remove_user(db_path: str, name: str, email: str) -> int:
     except Exception as e:
         return DB_WRITE_ERR
 
+def list_users() -> int:
+    pass

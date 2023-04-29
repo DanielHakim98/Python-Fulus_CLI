@@ -86,3 +86,7 @@ def remove_user(
         raise typer.Exit(1)
     else:
         typer.secho(f"User '{username}' has been removed", fg=typer.colors.GREEN)
+
+@app.command()
+def list_users() -> None:
+    pass
