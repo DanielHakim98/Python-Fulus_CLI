@@ -1,4 +1,5 @@
 import sqlalchemy as sql
+from sqlalchemy import select, delete,  Sequence
 from sqlalchemy.orm import Session
 from fulus_cli import models, SUCCESS, DB_WRITE_ERR, DB_READ_ERR
 
@@ -15,19 +16,16 @@ def create_user(db_path: str, name: str, email: str) -> int:
     """Create a new user from the given name"""
     try:
         engine = sql.create_engine(db_path)
-        query = f"""
-            INSERT INTO {models.User.__tablename__} (name, email)
-            VALUES (:name, :email)
-        """
+        user = models.User(name=name, email=email)
         with Session(engine) as session:
-            session.execute(sql.text(query), [{"name": name, "email": email}])
+            session.add(user)
             session.commit()
         return SUCCESS
 
     except Exception as e:
         return DB_WRITE_ERR
 
-from sqlalchemy import delete
+
 def remove_user(db_path: str, name: str, email: str) -> int:
     """Remove a user from the given name and email"""
     try:
@@ -43,8 +41,7 @@ def remove_user(db_path: str, name: str, email: str) -> int:
     except Exception as e:
         return DB_WRITE_ERR
 
-from sqlalchemy import select, Sequence
-def list_users(db_path: str) -> tuple[ Sequence[models.User] | None, int ]:
+def list_users(db_path: str) -> tuple[Sequence[models.User] | None, int]:
     """Get list of users created"""
     try:
         engine = sql.create_engine(db_path)
