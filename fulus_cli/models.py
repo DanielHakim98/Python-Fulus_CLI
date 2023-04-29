@@ -1,5 +1,5 @@
 import re
-from financial_manager import  FILE_ERR
+from fulus_cli import FILE_ERR
 from datetime import datetime
 from sqlalchemy.orm import (
     DeclarativeBase,

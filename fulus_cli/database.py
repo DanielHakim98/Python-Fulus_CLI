@@ -1,6 +1,6 @@
 import sqlalchemy as sql
 from sqlalchemy.orm import Session
-from financial_manager import models, SUCCESS, DB_WRITE_ERR, DB_READ_ERR
+from fulus_cli import models, SUCCESS, DB_WRITE_ERR, DB_READ_ERR
 
 def init_database(db_path: str) -> int:
     """Create a new financial manager database """

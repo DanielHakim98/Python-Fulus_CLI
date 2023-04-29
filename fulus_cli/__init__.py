@@ -1,5 +1,5 @@
-"""Top-level package for financial_manager"""
-__app_name__ = "financial_manager"
+"""Top-level package for fulus_cli"""
+__app_name__ = "fulus_cli"
 __version__ = "0.10"
 
 (

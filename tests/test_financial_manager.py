@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock, patch
 from config import Config
 from typer.testing import CliRunner
-from financial_manager import (
+from fulus_cli import (
     cli,
     __app_name__,
     __version__,
@@ -27,7 +27,7 @@ class TestUser:
             cli.app,
             ["create-user", USERNAME, EMAIL]
         )
-        with patch('financial_manager.database.create_user', mocked_create_user):
+        with patch('fulus_cli.database.create_user', mocked_create_user):
             result = runner.invoke(
                 cli.app,
                 ["create-user", USERNAME, EMAIL],
@@ -47,7 +47,7 @@ class TestUser:
             cli.app,
             ["remove-user", USERNAME, EMAIL]
         )
-        with patch('financial_manager.database.remove_user', mocked_remove_user):
+        with patch('fulus_cli.database.remove_user', mocked_remove_user):
             result = runner.invoke(
                 cli.app,
                 ["remove-user", USERNAME, EMAIL],
@@ -65,7 +65,7 @@ class TestUser:
         ]
         mock_list_users = Mock(return_value=(fake_data, 0,))
 
-        with patch('financial_manager.database.list_users', mock_list_users):
+        with patch('fulus_cli.database.list_users', mock_list_users):
             result = runner.invoke(cli.app, ['list-users'])
 
         mock_list_users.assert_called_once_with(db_path)
