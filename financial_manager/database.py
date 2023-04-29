@@ -27,6 +27,20 @@ def create_user(db_path: str, name: str, email: str) -> int:
     except Exception as e:
         return DB_WRITE_ERR
 
+from sqlalchemy import delete
+
 def remove_user(db_path: str, name: str, email: str) -> int:
     """Remove a user from the given name and email"""
-    pass
+    try:
+        engine = sql.create_engine(db_path)
+        stmt = delete(models.User)\
+                .where(models.User.name == name)\
+                .where(models.User.email == email)
+        with Session(engine) as session:
+            session.execute(stmt)
+            session.commit()
+        return SUCCESS
+
+    except Exception as e:
+        return DB_WRITE_ERR
+

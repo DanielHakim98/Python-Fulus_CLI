@@ -26,7 +26,7 @@ class User(Base):
     name: Mapped[str] = mapped_column(String)
     email: Mapped[str] = mapped_column(String)
 
-    transactions: Mapped[list["Transaction"] | None] = relationship(back_populates = "transaction_user")
+    transactions: Mapped[list["Transaction"] | None] = relationship(back_populates="user")
 
     __table_args__ = (
         UniqueConstraint('name', 'email', name='uq_user_name_email'),
@@ -39,12 +39,13 @@ class User(Base):
     def __repr__(self) -> str:
         return f"User(id={self.id!r}, name={self.name!r}, email={self.email!r})"
 
+
 class Category(Base):
     __tablename__ = "transaction_category"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String)
 
-    transactions: Mapped[list["Transaction"] | None] = relationship(back_populates="transaction_category")
+    transactions: Mapped[list["Transaction"] | None] = relationship(back_populates="category")
 
     def __init__(self, title: str) -> None:
         self.title = title
@@ -61,8 +62,8 @@ class Transaction(Base):
     category_id: Mapped[int] = mapped_column(ForeignKey("transaction_category.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("transaction_user.id"), nullable=False)
 
-    category: Mapped[Category] = relationship(back_populates = "transaction_master")
-    user: Mapped[User] = relationship(back_populates = "transaction_master")
+    category: Mapped[Category] = relationship(back_populates="transactions")
+    user: Mapped[User] = relationship(back_populates="transactions")
 
     def __init__(self, date: datetime, amount:float, category_id: int, user_id: int) -> None:
         self.date = convert_to_datetime(date)
@@ -78,6 +79,7 @@ class Transaction(Base):
             + f"category_id={self.category_id!r}"
             + f"user_id={self.user_id!r})"
         )
+
 
 def convert_to_datetime(date:str)-> datetime | int:
     pattern = r"^(19\d{2}|20[0-2][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"

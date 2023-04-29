@@ -65,3 +65,24 @@ def create_user(
         raise typer.Exit(1)
     else:
         typer.secho(f"User '{username}' has been created", fg=typer.colors.GREEN)
+
+@app.command()
+def remove_user(
+    username: str = typer.Argument(..., help="The name of the user to be removed"),
+    email: str = typer.Argument(..., help="The email of the user")
+) -> None:
+    """Remove existing user"""
+    status_code = database.remove_user(
+        Config.SQLALCHEMY_DATABASE_URI,
+        username,
+        email
+    )
+
+    if status_code != 0:
+        typer.secho(
+            f"User can't be removed. Error {ERRORS[status_code]}",
+            fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+    else:
+        typer.secho(f"User '{username}' has been removed", fg=typer.colors.GREEN)
