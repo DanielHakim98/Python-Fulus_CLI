@@ -1,6 +1,6 @@
 import sqlalchemy as sql
 from sqlalchemy.orm import Session
-from financial_manager import models, SUCCESS, DB_WRITE_ERR
+from financial_manager import models, SUCCESS, DB_WRITE_ERR, DB_READ_ERR
 
 def init_database(db_path: str) -> int:
     """Create a new financial manager database """
@@ -28,7 +28,6 @@ def create_user(db_path: str, name: str, email: str) -> int:
         return DB_WRITE_ERR
 
 from sqlalchemy import delete
-
 def remove_user(db_path: str, name: str, email: str) -> int:
     """Remove a user from the given name and email"""
     try:
@@ -44,5 +43,13 @@ def remove_user(db_path: str, name: str, email: str) -> int:
     except Exception as e:
         return DB_WRITE_ERR
 
-def list_users() -> int:
-    pass
+from sqlalchemy import select, Sequence
+def list_users(db_path: str) -> tuple[ Sequence[models.User] | None, int ]:
+    """Get list of users created"""
+    try:
+        engine = sql.create_engine(db_path)
+        with Session(engine) as session:
+            result = session.scalars(select(models.User)).all()
+        return result, 0
+    except Exception as e:
+        return None, DB_READ_ERR

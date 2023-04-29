@@ -89,4 +89,16 @@ def remove_user(
 
 @app.command()
 def list_users() -> None:
-    pass
+    result, status_code = database.list_users(Config.SQLALCHEMY_DATABASE_URI)
+    if status_code != 0:
+        typer.secho(
+            f"Failed while retriveing users. Error {ERRORS[status_code]}",
+            fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+    else:
+        print("------------------")
+        print("id | name | email")
+        print("------------------")
+        for row in result:
+            print(' | '.join([str(row.id), row.name, row.email]))
