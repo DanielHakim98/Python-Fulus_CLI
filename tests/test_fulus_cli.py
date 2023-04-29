@@ -3,16 +3,16 @@ from unittest.mock import Mock, patch
 from config import Config
 from typer.testing import CliRunner
 from fulus_cli import (
-    cli,
     __app_name__,
     __version__,
+    cli_main,
     models
 )
 
 runner = CliRunner()
 
 def test_version():
-    result = runner.invoke(cli.app, ["--version"])
+    result = runner.invoke(cli_main.app, ["--version"])
     assert result.exit_code == 0
     assert f"{__app_name__} v{__version__}\n" in result.stdout
 
@@ -23,16 +23,13 @@ class TestUser:
         db_path = Config.SQLALCHEMY_DATABASE_URI
 
         mocked_create_user = Mock(return_value=0)
-        result = runner.invoke(
-            cli.app,
-            ["create-user", USERNAME, EMAIL]
-        )
         with patch('fulus_cli.database.create_user', mocked_create_user):
             result = runner.invoke(
-                cli.app,
-                ["create-user", USERNAME, EMAIL],
+                cli_main.app,
+                ["users","create", USERNAME, EMAIL],
                 env={"SQLALCHEMY_DATABASE_URI": db_path}
             )
+
         assert result.exit_code == 0
         assert f"User '{USERNAME}' has been created" in result.stdout
         mocked_create_user.assert_called_once_with(db_path,USERNAME,EMAIL)
@@ -43,16 +40,13 @@ class TestUser:
         db_path = Config.SQLALCHEMY_DATABASE_URI
 
         mocked_remove_user = Mock(return_value=0)
-        result = runner.invoke(
-            cli.app,
-            ["remove-user", USERNAME, EMAIL]
-        )
         with patch('fulus_cli.database.remove_user', mocked_remove_user):
             result = runner.invoke(
-                cli.app,
-                ["remove-user", USERNAME, EMAIL],
+                cli_main.app,
+                ["users", "delete", USERNAME, EMAIL],
                 env={"SQLALCHEMY_DATABASE_URI": db_path}
             )
+
         assert result.exit_code == 0
         assert f"User '{USERNAME}' has been removed" in result.stdout
         mocked_remove_user.assert_called_once_with(db_path,USERNAME,EMAIL)
@@ -66,7 +60,7 @@ class TestUser:
         mock_list_users = Mock(return_value=(fake_data, 0,))
 
         with patch('fulus_cli.database.list_users', mock_list_users):
-            result = runner.invoke(cli.app, ['list-users'])
+            result = runner.invoke(cli_main.app, ['users', "index"])
 
         mock_list_users.assert_called_once_with(db_path)
         expected_output = "------------------\n" \
