@@ -97,8 +97,8 @@ def list_users() -> None:
         )
         raise typer.Exit(1)
     else:
-        print("------------------")
-        print("id | name | email")
-        print("------------------")
+        typer.secho("------------------")
+        typer.secho("id | name | email")
+        typer.secho("------------------")
         for row in result:
-            print(' | '.join([str(row.id), row.name, row.email]))
+            typer.secho(' | '.join([str(row.id), row.name, row.email]))
