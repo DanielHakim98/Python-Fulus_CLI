@@ -1,7 +1,8 @@
 import sqlalchemy as sql
 from sqlalchemy import select, delete,  Sequence
 from sqlalchemy.orm import Session
-from fulus_cli import models, SUCCESS, DB_WRITE_ERR, DB_READ_ERR
+from fulus_cli import SUCCESS, DB_WRITE_ERR, DB_READ_ERR
+from fulus_cli.sql_orm import models
 
 def init_database(db_path: str) -> int:
     """Create a new financial manager database """

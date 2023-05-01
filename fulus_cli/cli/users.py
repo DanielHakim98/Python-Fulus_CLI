@@ -4,9 +4,9 @@ from config import Config
 from fulus_cli import (
     __app_name__,
     __version__,
-    ERRORS,
-    database
+    ERRORS
 )
+from fulus_cli.sql_orm import db
 
 app = typer.Typer()
 
@@ -35,7 +35,7 @@ def create(
         )
         raise typer.Exit(1)
 
-    status_code = database.create_user(
+    status_code = db.create_user(
         Config.SQLALCHEMY_DATABASE_URI,
         username.strip(),
         email.strip()
@@ -56,7 +56,7 @@ def delete(
     email: str = typer.Argument(..., help="The email of the user")
 ) -> None:
     """Remove existing user"""
-    status_code = database.remove_user(
+    status_code = db.remove_user(
         Config.SQLALCHEMY_DATABASE_URI,
         username,
         email
@@ -74,7 +74,7 @@ def delete(
 @app.command()
 def list() -> None:
     """List all users"""
-    result, status_code = database.list_users(Config.SQLALCHEMY_DATABASE_URI)
+    result, status_code = db.list_users(Config.SQLALCHEMY_DATABASE_URI)
     if status_code != 0:
         typer.secho(
             f"Failed while retriveing users. Error: {ERRORS[status_code]}",

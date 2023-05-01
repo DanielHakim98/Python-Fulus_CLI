@@ -6,10 +6,10 @@ from fulus_cli import (
     DB_WRITE_ERR,
     ERRORS,
     __app_name__,
-    __version__,
-    cli_main,
-    models
+    __version__
 )
+from fulus_cli.cli import main
+from fulus_cli.sql_orm import models
 
 runner = CliRunner()
 
@@ -20,9 +20,9 @@ class TestUser:
 
     def test_create_user(self):
         mocked_create_user = Mock(return_value=0)
-        with patch('fulus_cli.database.create_user', mocked_create_user):
+        with patch('fulus_cli.sql_orm.db.create_user', mocked_create_user):
             result = runner.invoke(
-                cli_main.app,
+                main.app,
                 ["users","create", TestUser.USERNAME, TestUser.EMAIL],
                 env={"SQLALCHEMY_DATABASE_URI": TestUser.db_path}
             )
@@ -37,7 +37,7 @@ class TestUser:
     def test_create_empty_name(self):
        NAME = ""
        result = runner.invoke(
-           cli_main.app,
+           main.app,
            ["users","create", NAME, TestUser.EMAIL],
         )
        assert result.exit_code == 1
@@ -46,7 +46,7 @@ class TestUser:
     def test_valid_email(self):
         EMAIL = "example"
         result = runner.invoke(
-           cli_main.app,
+           main.app,
            ["users","create", TestUser.USERNAME, EMAIL],
         )
         assert result.exit_code == 1
@@ -54,9 +54,9 @@ class TestUser:
 
     def test_remove_user(self):
         mocked_remove_user = Mock(return_value=0)
-        with patch('fulus_cli.database.remove_user', mocked_remove_user):
+        with patch('fulus_cli.sql_orm.db.remove_user', mocked_remove_user):
             result = runner.invoke(
-                cli_main.app,
+                main.app,
                 ["users", "delete", TestUser.USERNAME, TestUser.EMAIL],
                 env={"SQLALCHEMY_DATABASE_URI": TestUser.db_path}
             )
@@ -75,8 +75,8 @@ class TestUser:
         ]
         mock_list_users = Mock(return_value=(fake_data, 0,))
 
-        with patch('fulus_cli.database.list_users', mock_list_users):
-            result = runner.invoke(cli_main.app, ['users', "index"])
+        with patch('fulus_cli.sql_orm.db.list_users', mock_list_users):
+            result = runner.invoke(main.app, ['users', "list"])
 
         mock_list_users.assert_called_once_with(db_path)
         expected_output = "------------------\n" \
