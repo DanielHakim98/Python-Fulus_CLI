@@ -35,7 +35,7 @@ class TestUser:
             TestUser.EMAIL
         )
 
-    def test_create_empty_name(self):
+    def test_is_not_empty_name(self):
        NAME = ""
        result = runner.invoke(
            main.app,

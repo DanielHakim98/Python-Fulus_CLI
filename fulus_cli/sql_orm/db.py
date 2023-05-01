@@ -50,3 +50,13 @@ def list_users(db_path: str) -> tuple[Sequence[models.User] | None, int]:
         return result, 0
     except Exception as e:
         return None, DB_READ_ERR
+
+def create_category(db_path: str, title: str) -> int:
+    pass
+
+def list_categories(
+        db_path: str) -> tuple[Sequence[models.Category] | None, int]:
+    pass
+
+def delete_category(db_path: str,  title: str) -> int:
+    pass
