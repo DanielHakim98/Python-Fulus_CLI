@@ -1,15 +1,15 @@
 import pytest
-from unittest.mock import Mock, patch
 from config import Config
+from fulus_cli.cli import main
 from typer.testing import CliRunner
+from unittest.mock import Mock, patch
+from fulus_cli.sql_orm import models
 from fulus_cli import (
     DB_WRITE_ERR,
     ERRORS,
     __app_name__,
     __version__
 )
-from fulus_cli.cli import main
-from fulus_cli.sql_orm import models
 
 runner = CliRunner()
 
@@ -32,7 +32,8 @@ class TestUser:
         mocked_create_user.assert_called_once_with(
             TestUser.db_path,
             TestUser.USERNAME,
-            TestUser.EMAIL)
+            TestUser.EMAIL
+        )
 
     def test_create_empty_name(self):
        NAME = ""

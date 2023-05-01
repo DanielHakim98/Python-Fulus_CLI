@@ -1,3 +1,4 @@
+"""CLI commands for 'Users'"""
 import typer
 import re
 from config import Config

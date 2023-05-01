@@ -1,13 +1,10 @@
 import pytest
-from unittest.mock import Mock, patch
-from config import Config
 from typer.testing import CliRunner
+from fulus_cli.cli import main
 from fulus_cli import (
     __app_name__,
     __version__
 )
-from fulus_cli.cli import main
-from fulus_cli.sql_orm import models
 
 runner = CliRunner()
 
