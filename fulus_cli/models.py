@@ -29,7 +29,8 @@ class User(Base):
     transactions: Mapped[list["Transaction"] | None] = relationship(back_populates="user")
 
     __table_args__ = (
-        UniqueConstraint('name', 'email', name='uq_user_name_email'),
+        UniqueConstraint('name', 'email', name='uq_user_name_email'),\
+        UniqueConstraint('name', name='uq_user_name')
     )
 
     def __init__(self, name: str, email:str) -> None:

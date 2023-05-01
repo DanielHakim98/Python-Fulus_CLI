@@ -1,8 +1,8 @@
-"""Create 'financial_manager' database
+"""Recreating database
 
-Revision ID: c1a5f307f074
+Revision ID: 80a7a4e20867
 Revises: 
-Create Date: 2023-04-23 17:19:42.629617
+Create Date: 2023-05-01 14:11:35.759437
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c1a5f307f074'
+revision = '80a7a4e20867'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,7 +28,8 @@ def upgrade() -> None:
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name', 'email', name='uq_user_name_email')
+    sa.UniqueConstraint('name', 'email', name='uq_user_name_email'),
+    sa.UniqueConstraint('name', name='uq_user_name')
     )
     op.create_table('transaction_master',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
