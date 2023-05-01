@@ -19,7 +19,6 @@ from sqlalchemy import (
 class Base(DeclarativeBase):
     pass
 
-
 class User(Base):
     __tablename__ = "transaction_user"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -80,7 +79,6 @@ class Transaction(Base):
             + f"category_id={self.category_id!r}"
             + f"user_id={self.user_id!r})"
         )
-
 
 def convert_to_datetime(date:str)-> datetime | int:
     pattern = r"^(19\d{2}|20[0-2][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
