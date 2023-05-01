@@ -25,7 +25,6 @@ def create_user(db_path: str, name: str, email: str) -> int:
     except Exception as e:
         return DB_WRITE_ERR
 
-
 def remove_user(db_path: str, name: str, email: str) -> int:
     """Remove a user from the given name and email"""
     try:
