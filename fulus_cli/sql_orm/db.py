@@ -1,8 +1,48 @@
 import sqlalchemy as sql
-from sqlalchemy import select, delete,  Sequence
+from sqlalchemy import select, delete, Sequence
 from sqlalchemy.orm import Session
 from fulus_cli import SUCCESS, DB_WRITE_ERR, DB_READ_ERR
 from fulus_cli.sql_orm import models
+
+class DBConnection():
+    def __init__(self, db_path):
+        self.engine = sql.create_engine(db_path)
+        self.session = Session(self.engine)
+
+    def create(self, model_obj: models.Base) -> int:
+        try:
+            with self.session as session:
+                session.add(model_obj)
+                session.commit()
+            return SUCCESS
+        except Exception as e:
+            return DB_WRITE_ERR
+
+    def get_all(self, model_obj) -> tuple[Sequence[models.User] | None, int]:
+        try:
+            with self.session as session:
+                result = session.scalars(select(model_obj)).all()
+            return result, 0
+        except Exception as e:
+            return DB_READ_ERR
+
+    def delete(self, model_obj) -> int:
+        try:
+            with self.session as session:
+                session.delete(model_obj)
+                session.commit()
+            return SUCCESS
+        except Exception as e:
+            return DB_WRITE_ERR
+
+    def update(self, model_obj) -> int:
+        try:
+            with self.session as session:
+                session.merge(model_obj)
+                session.commit()
+            return SUCCESS
+        except Exception as e:
+            return DB_WRITE_ERR
 
 def init_database(db_path: str) -> int:
     """Create a new financial manager database """
