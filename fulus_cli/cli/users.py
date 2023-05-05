@@ -7,9 +7,10 @@ from fulus_cli import (
     __version__,
     ERRORS
 )
-from fulus_cli.sql_orm import db
+from fulus_cli.sql_orm import db, models
 
 app = typer.Typer()
+database = db.DBConnection(Config.SQLALCHEMY_DATABASE_URI)
 
 @app.command()
 def create(
@@ -36,11 +37,11 @@ def create(
         )
         raise typer.Exit(1)
 
-    status_code = db.create_user(
-        Config.SQLALCHEMY_DATABASE_URI,
-        username.strip(),
-        email.strip()
+    user = models.User(
+        name=username.strip(),
+        email=email.strip()
     )
+    status_code = database.create(user)
 
     if status_code != 0:
         typer.secho(

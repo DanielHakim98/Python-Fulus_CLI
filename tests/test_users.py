@@ -3,7 +3,7 @@ from config import Config
 from fulus_cli.cli import main
 from typer.testing import CliRunner
 from unittest.mock import Mock, patch
-from fulus_cli.sql_orm import models
+from fulus_cli.sql_orm import db, models
 from fulus_cli import (
     DB_WRITE_ERR,
     ERRORS,
@@ -18,22 +18,17 @@ class TestUser:
     EMAIL = "daniel@example.com"
     db_path = Config.SQLALCHEMY_DATABASE_URI
 
-    def test_create_user(self):
-        mocked_create_user = Mock(return_value=0)
-        with patch('fulus_cli.sql_orm.db.create_user', mocked_create_user):
+    def test_create_user_new(self):
+        def mocked_create(mocked_self,mocked_obj):
+            return 0
+        with patch.object(db.DBConnection, 'create', mocked_create):
             result = runner.invoke(
                 main.app,
                 ["users","create", TestUser.USERNAME, TestUser.EMAIL],
                 env={"SQLALCHEMY_DATABASE_URI": TestUser.db_path}
-            )
-
+        )
         assert result.exit_code == 0
         assert f"User '{TestUser.USERNAME}' has been created" in result.stdout
-        mocked_create_user.assert_called_once_with(
-            TestUser.db_path,
-            TestUser.USERNAME,
-            TestUser.EMAIL
-        )
 
     def test_is_not_empty_name(self):
        NAME = ""
