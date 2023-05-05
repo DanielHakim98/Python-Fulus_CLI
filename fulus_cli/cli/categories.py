@@ -7,17 +7,67 @@ from fulus_cli import (
     __version__,
     ERRORS
 )
-from fulus_cli.sql_orm import db
+from fulus_cli.sql_orm import db, models
 
 app = typer.Typer()
+database = db.DBConnection(Config.SQLALCHEMY_DATABASE_URI)
 
 @app.command()
-def create() -> None:
-    pass
+def create(
+    title: str = typer.Argument(..., help="The name of the category")
+) -> None:
+    """Create a new category"""
+    # Check if title is empty
+    if not title.strip():
+        typer.secho(
+            "Name cannot be empty",
+            fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+
+    # Check if the title is invalid (only characters and numbersa are allowed)
+    if not re.fullmatch(
+            r"[A-Za-z0-9]+",
+            title.strip()):
+        typer.secho(
+            "Title must be a valid title",
+            fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+
+    category = models.Category(
+        title=title.strip()
+    )
+    status_code = database.create(category)
+
+    if status_code != 0:
+        typer.secho(
+            f"Category creation failed. Error {ERRORS[status_code]}",
+            fg=typer.colors.RED
+        )
+    else:
+        typer.secho(
+            f"Category '{title}' has been added",
+            fg=typer.colors.GREEN
+        )
+
 
 @app.command()
 def list() -> None:
-    pass
+    """List all categories"""
+    result, status_code = database.get_all(models.Category)
+    if status_code != 0:
+        typer.secho(
+            f"Failed while retriveing categories. Error: {ERRORS[status_code]}",
+            fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+    else:
+        typer.secho("------------")
+        typer.secho("id | title ")
+        typer.secho("------------")
+        for row in result:
+            typer.secho(' | '.join([str(row.id), row.title]))
 
 @app.command()
 def update() -> None:
