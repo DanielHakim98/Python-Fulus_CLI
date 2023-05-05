@@ -58,10 +58,10 @@ def delete(
     email: str = typer.Argument(..., help="The email of the user")
 ) -> None:
     """Remove existing user"""
-    status_code = db.remove_user(
-        Config.SQLALCHEMY_DATABASE_URI,
-        username,
-        email
+    user = database.get_all(models.User(name=username, email=email))
+    status_code = database.delete(
+        models.User,
+        user
     )
 
     if status_code != 0:
@@ -76,7 +76,9 @@ def delete(
 @app.command()
 def list() -> None:
     """List all users"""
-    result, status_code = db.list_users(Config.SQLALCHEMY_DATABASE_URI)
+    result, status_code = database.get_all(
+        models.User
+    )
     if status_code != 0:
         typer.secho(
             f"Failed while retriveing users. Error: {ERRORS[status_code]}",
