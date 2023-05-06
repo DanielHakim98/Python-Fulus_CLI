@@ -74,13 +74,3 @@ def init_database(db_path: str) -> int:
         return SUCCESS
     except Exception as e:
         return DB_WRITE_ERR
-
-def create_category(db_path: str, title: str) -> int:
-    pass
-
-def list_categories(
-        db_path: str) -> tuple[Sequence[models.Category] | None, int]:
-    pass
-
-def delete_category(db_path: str,  title: str) -> int:
-    pass
