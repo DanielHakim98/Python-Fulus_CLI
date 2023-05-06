@@ -25,6 +25,13 @@ class User(Base):
     name: Mapped[str] = mapped_column(String)
     email: Mapped[str] = mapped_column(String)
 
+    # note for myself:
+    #------------------
+    # back_populates parameter takes column name of parent table that is referenced by other tables
+    # example: 'Transaction' table has attributes 'user_id' that refers to 'User' table attribute 'id'.
+    #          This means 'Transaction' table is a child table of 'User' table. Therefore, we need to define
+    #          that any references of user_id in 'Transaction' table can be referenced back to 'User' table column id
+
     transactions: Mapped[list["Transaction"] | None] = relationship(back_populates="user")
 
     __table_args__ = (
@@ -46,7 +53,9 @@ class Category(Base):
     title: Mapped[str] = mapped_column(String)
 
     transactions: Mapped[list["Transaction"] | None] = relationship(back_populates="category")
-
+    __table_args__ = (
+        UniqueConstraint('title', name='uq_category_title'),
+    )
     def __init__(self, title: str) -> None:
         self.title = title
 
