@@ -58,7 +58,7 @@ def delete(
     email: str = typer.Argument(..., help="The email of the user")
 ) -> None:
     """Remove existing user"""
-    user = database.get_all(models.User(name=username, email=email))
+    user = database.read(models.User(name=username, email=email))
     status_code = database.delete(
         models.User,
         user
@@ -76,7 +76,7 @@ def delete(
 @app.command()
 def list() -> None:
     """List all users"""
-    result, status_code = database.get_all(
+    result, status_code = database.read(
         models.User
     )
     if status_code != 0:

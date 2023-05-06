@@ -65,7 +65,7 @@ class TestUser:
                 models.User(name="Bob", email="bob@example.com")
             ]
             return fake_data, 0
-        monkeypatch.setattr(db.DBConnection, 'get_all', mocked_get_all)
+        monkeypatch.setattr(db.DBConnection, 'read', mocked_get_all)
         result = runner.invoke(main.app, ['users', "list"])
         expected_output = "------------------\n" \
                         "id | name | email\n" \
