@@ -14,14 +14,14 @@ from fulus_cli import (
 runner = CliRunner()
 
 class TestCategory:
-    TITLE = 'category_1'
+    TITLE = 'category1'
     db_path = Config.SQLALCHEMY_DATABASE_URI
 
-    def test_create_category(self):
+    def test_create_category(self, monkeypatch):
         def mocked_create(mocked_self,mocked_obj):
             return 0
-        with patch.object(db.DBConnection, 'create', mocked_create):
-            result = runner.invoke(
+        monkeypatch.setattr(db.DBConnection, 'create', mocked_create)
+        result = runner.invoke(
                 main.app,
                 ["categories","create", TestCategory.TITLE],
                 env={"SQLALCHEMY_DATABASE_URI": TestCategory.db_path}
@@ -37,7 +37,7 @@ class TestCategory:
            ["categories","create", TITLE],
         )
        assert result.exit_code == 1
-       assert f"Title cannot be empty" in result.stdout
+       assert f"Name cannot be empty" in result.stdout
 
     def test_list_category(self, monkeypatch):
         def mocked_get_all(self, model_obj):
@@ -47,7 +47,7 @@ class TestCategory:
                 models.Category(title="Saving")
             ]
             return fake_data, 0
-        monkeypatch.setattr(db.DBConnection, 'get_all', mocked_get_all)
+        monkeypatch.setattr(db.DBConnection, 'read', mocked_get_all)
         result = runner.invoke(
             main.app,
             ["categories", "list"]
@@ -60,20 +60,18 @@ class TestCategory:
                 "None | Saving"
         assert result.output.strip() == expected_output
 
-    def test_remove_category(self):
-        mocked_remove_category = Mock(return_value=0)
-
-        with patch(
-                'fulus_cli.sql_orm.db.delete_category',
-                mocked_remove_category):
-            result = runner.invoke(
-                main.app,
-                ["categories", "delete", TestCategory.TITLE],
-                env={"SQLALCHEMY_DATABASE_URI": TestCategory.db_path}
-            )
+    def test_remove_category(self, monkeypatch):
+        def mocked_delete(self, model_obj, id):
+            return 0
+        def mocked_get_id(self, mode_obj):
+            return [models.Category(title=TestCategory.TITLE)], 0
+        monkeypatch.setattr(db.DBConnection, "delete", mocked_delete)
+        monkeypatch.setattr(db.DBConnection, "get_id", mocked_get_id)
+        result = runner.invoke(
+            main.app,
+            ["categories", "delete", TestCategory.TITLE],
+            env={"SQLALCHEMY_DATABASE_URI": TestCategory.db_path}
+        )
 
         assert result.exit_code == 0
         assert f"Category '{TestCategory.TITLE}' has been removed" in result.stdout
-        mocked_remove_category.assert_called_once_with(
-            TestCategory.db_path,
-            TestCategory.TITLE)
