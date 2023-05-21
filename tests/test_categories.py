@@ -2,7 +2,6 @@ import pytest
 from config import Config
 from fulus_cli.cli import main
 from typer.testing import CliRunner
-from unittest.mock import Mock, patch
 from fulus_cli.sql_orm import db, models
 from fulus_cli import (
     DB_WRITE_ERR,
@@ -31,13 +30,13 @@ class TestCategory:
             in result.stdout
 
     def test_is_not_empty_title(self):
-       TITLE = ""
-       result = runner.invoke(
+        TITLE = ""
+        result = runner.invoke(
            main.app,
            ["categories","create", TITLE],
         )
-       assert result.exit_code == 1
-       assert f"Name cannot be empty" in result.stdout
+        assert result.exit_code == 1
+        assert f"Name cannot be empty" in result.stdout
 
     def test_list_category(self, monkeypatch):
         def mocked_get_all(self, model_obj):

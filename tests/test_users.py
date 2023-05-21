@@ -2,7 +2,6 @@ import pytest
 from config import Config
 from fulus_cli.cli import main
 from typer.testing import CliRunner
-from unittest.mock import patch
 from fulus_cli.sql_orm import db, models
 from fulus_cli import (
     __app_name__,
