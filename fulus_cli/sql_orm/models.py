@@ -75,7 +75,7 @@ class Transaction(Base):
     user: Mapped[User] = relationship(back_populates="transactions")
 
     def __init__(self, date: datetime, amount:float, category_id: int, user_id: int) -> None:
-        self.date = convert_to_datetime(date)
+        self.date = date
         self.amount = amount
         self.category_id = category_id
         self.user_id = user_id
@@ -92,6 +92,5 @@ class Transaction(Base):
 def convert_to_datetime(date:str)-> datetime | int:
     pattern = r"^(19\d{2}|20[0-2][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
     if re.match(pattern, date):
-        split = date.split('-')
-        return datetime(split[0],split[1],split[2])
-    return FILE_ERR
+        return datetime.strptime(date, '%Y-%m-%d'), 0
+    return None, FILE_ERR
