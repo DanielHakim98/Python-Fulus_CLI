@@ -51,7 +51,7 @@ class TestUser:
         monkeypatch.setattr(db.DBConnection, "delete", mocked_delete)
         result = runner.invoke(
             main.app,
-            ["users", "delete", TestUser.USERNAME, TestUser.EMAIL],
+            ["users", "delete", TestUser.USERNAME],
             env={"SQLALCHEMY_DATABASE_URI": TestUser.db_path}
         )
         assert result.exit_code == 0

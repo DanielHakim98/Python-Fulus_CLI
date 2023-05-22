@@ -15,8 +15,6 @@ class DBConnection():
             stmt = select(models.User)\
                 .where(
                     models.User.name == model_obj.name
-                ).where(
-                    models.User.email == model_obj.email
                 )
         elif isinstance(model_obj, models.Category):
             stmt = select(models.Category).where(

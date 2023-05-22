@@ -55,15 +55,29 @@ def create(
 @app.command()
 def delete(
     username: str = typer.Argument(..., help="The name of the user to be removed"),
-    email: str = typer.Argument(..., help="The email of the user")
 ) -> None:
     """Remove existing user"""
-    user = database.read(models.User(name=username, email=email))
+
+    user, status_code = database.get_id(
+        models.User(name=username, email="")
+    )
+    if status_code != 0:
+        typer.secho(
+            f"User can't be retrieved. Error: {ERRORS[status_code]}",
+            fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+    elif len(user) < 1:
+        typer.secho(
+            "User does not exist",
+            fg=typer.colors.RED
+        )
+    user_id = user[0].id
+
     status_code = database.delete(
         models.User,
-        user
+        user_id
     )
-
     if status_code != 0:
         typer.secho(
             f"User can't be removed. Error: {ERRORS[status_code]}",
