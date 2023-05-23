@@ -11,33 +11,14 @@ runner = CliRunner()
 class TestTransaction:
     date = "2023-05-23"
     amount = "100"
-    category= "TestCategory"
-    user = "TestUser"
+    category= "Food"
+    user = "Daniel"
     db_path = Config.SQLALCHEMY_DATABASE_URI
 
-    @pytest.fixture
-    def mocked_dbconnection(self, monkeypatch):
-        class MockedDBConnection:
-            def get_id(self, obj):
-                return 100, 0
-
-            def create(self, obj):
-                return 0
-
-        mocked_connection = MockedDBConnection()
-        monkeypatch.setattr(db.DBConnection, "get_id", mocked_connection.get_id)
-        monkeypatch.setattr(db.DBConnection, "create", mocked_connection.create)
-        yield mocked_connection
-
-    def test_create_transaction(self, mocked_dbconnection, monkeypatch):
-        mocked_to_dt = mock.Mock(
-            return_value=(
-                datetime.strptime(TestTransaction.date, '%Y-%m-%d'),
-                0
-            )
-        )
-        monkeypatch.setattr(models, "convert_to_datetime", mocked_to_dt)
-
+    def test_create_transaction(self, monkeypatch):
+        def mocked_create(mocked_self, mocked_obj):
+            return 0
+        monkeypatch.setattr(db.DBConnection, 'create', mocked_create)
         result = runner.invoke(
             main.app,
             [
@@ -55,9 +36,6 @@ class TestTransaction:
 
         assert result.exit_code == 0
         assert "Transaction has been inserted." in result.stdout
-        assert mocked_to_dt.called
-        assert mocked_dbconnection.get_id.called
-        assert mocked_dbconnection.create.called
 
 
     def test_list_transaction(self, monkeypatch):

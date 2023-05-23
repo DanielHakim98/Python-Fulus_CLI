@@ -10,15 +10,7 @@ from fulus_cli.sql_orm.models import convert_to_datetime as to_dt
 app = typer.Typer()
 database = db.DBConnection(Config.SQLALCHEMY_DATABASE_URI)
 
-@app.command()
-def create(
-    date: str = typer.Argument(..., help="date"),
-    amount: str = typer.Argument(..., help="amount"),
-    category: str = typer.Argument(..., help="category"),
-    user: str = typer.Argument(..., help="user"),
-):
-    """Insert a transaction"""
-
+def _validate_date(date: str) -> datetime.datetime:
     date_datetime, status_code = to_dt(date)
     if status_code != 0:
         typer.secho(
@@ -26,45 +18,72 @@ def create(
             fg=typer.colors.RED
         )
         raise typer.Exit(1)
-    # print("date_datetime: ", date_datetime)
+    return date_datetime
 
-    category_data, status_code = database.get_id(models.Category(title=category))
+def _validate_amount(amount: str) -> str:
+    if not re.fullmatch(
+        r"^(?:[1-9]\d*|0)(?:\.\d+)?$",
+        amount
+    ):
+        typer.secho(
+            "Amount must be either more than zero and a number",
+            fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+    return amount
+
+
+def _category_id(category: str) -> int:
+    category_list, status_code = database.get_id(models.Category(title=category))
     if status_code != 0:
         typer.secho(
-            f"Category can't be retrieved. Error: {ERRORS[status_code]}",
+            f"Category can't be retrieved. Error: {ERRORS.get(status_code)}",
             fg=typer.colors.RED
         )
         raise typer.Exit(1)
-    elif len(category_data) < 1:
+    elif len(category_list) < 1:
         typer.secho(
-            "Category does not exist",
+            f"Category does not exist",
             fg=typer.colors.RED
         )
         raise typer.Exit(1)
-    category_id = category_data[0].id
-    # print("category_data: ", category_data)
+    return category_list[0].id
 
-    user_data, status_code = database.get_id(models.User(name=user, email=""))
+def _user_id(user: str) -> int:
+    user_list, status_code = database.get_id(models.User(name=user, email=""))
     if status_code != 0:
         typer.secho(
-            f"User can't be retrieved. Error: {ERRORS[status_code]}",
+            f"User can't be retrieved. Error: {ERRORS.get(status_code)}",
             fg=typer.colors.RED
         )
         raise typer.Exit(1)
-    elif len(user) < 1:
+    elif len(user_list) < 1:
         typer.secho(
-            "User does not exist",
+            f"User does not exist",
             fg=typer.colors.RED
         )
         raise typer.Exit(1)
-    user_id = user_data[0].id
-    # print("user_data: ", user_data)
+    return user_list[0].id
+
+
+@app.command()
+def create(
+    date: str = typer.Argument(...,
+                               help="The date spent (in 'YY-MM-DD' format)",
+                               callback=_validate_date),
+    amount: str = typer.Argument(...,
+                                 help="Money spent in currenciless unit",
+                                 callback=_validate_amount),
+    category: str = typer.Argument(..., help="Category name", callback=_category_id),
+    user: str = typer.Argument(..., help="User name", callback=_user_id),
+):
+    """Insert a transaction"""
 
     transaction = models.Transaction(
-        date=date_datetime,
+        date=date,
         amount=float(amount),
-        category_id=category_id,
-        user_id=user_id
+        category_id=category,
+        user_id=user
     )
 
     status_code = database.create(transaction)
