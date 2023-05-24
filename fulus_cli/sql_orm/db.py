@@ -1,21 +1,18 @@
 import sqlalchemy as sql
-from sqlalchemy import select, delete, Sequence
+from sqlalchemy import select, delete, exists, Sequence
 from sqlalchemy.orm import Session
 from fulus_cli import SUCCESS, DB_WRITE_ERR, DB_READ_ERR
 from fulus_cli.sql_orm import models
 
-class DBConnection():
+
+class DBConnection:
     def __init__(self, db_path):
         self.engine = sql.create_engine(db_path)
         self.session = Session(self.engine)
 
-    def get_id(self, model_obj)\
-            -> tuple[Sequence[models.Base] | None, int]:
+    def get_id(self, model_obj) -> tuple[Sequence[models.Base] | None, int]:
         if isinstance(model_obj, models.User):
-            stmt = select(models.User)\
-                .where(
-                    models.User.name == model_obj.name
-                )
+            stmt = select(models.User).where(models.User.name == model_obj.name)
         elif isinstance(model_obj, models.Category):
             stmt = select(models.Category).where(
                 models.Category.title == model_obj.title
@@ -43,10 +40,16 @@ class DBConnection():
                 result = session.scalars(select(model_obj)).all()
             return result, 0
         except Exception as e:
-            return None,DB_READ_ERR
+            return None, DB_READ_ERR
 
     def delete(self, model_obj, id) -> int:
         try:
+            # Validate id exists within databse
+            exists_query = select(exists().where(model_obj.id == model_obj.id))
+            result = session.execute(exists_query).scalar()
+            if bool(result) is False:
+                return DB_WRITE_ERR
+
             stmt = delete(model_obj).where(model_obj.id == id)
             with self.session as session:
                 session.execute(stmt)
@@ -64,8 +67,9 @@ class DBConnection():
         except Exception as e:
             return DB_WRITE_ERR
 
+
 def init_database(db_path: str) -> int:
-    """Create a new financial manager database """
+    """Create a new financial manager database"""
     try:
         engine = sql.create_engine(db_path)
         models.Base.metadata.create_all(engine)
