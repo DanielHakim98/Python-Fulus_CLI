@@ -1,5 +1,6 @@
 """CLI commands for 'Transactions'"""
 import datetime
+from typing import Annotated, Optional
 import typer
 import re
 from config import Config
@@ -87,7 +88,7 @@ def create(
 
 
 @app.command()
-def delete(tx_id: str = typer.Argument(..., help="The name of the category")):
+def delete(tx_id: str = typer.Argument(..., help="The id of the transactions")):
     """Remove existing transaction"""
     status_code = database.delete(models.Transaction, tx_id)
     if status_code != 0:
@@ -98,6 +99,50 @@ def delete(tx_id: str = typer.Argument(..., help="The name of the category")):
         raise typer.Exit(1)
     else:
         typer.secho(f"Transaction ID '{tx_id}' has been removed", fg=typer.colors.GREEN)
+
+
+@app.command()
+def update(
+    tx_id: str = typer.Argument(..., help="The id of the transactions"),
+    date: Annotated[
+        Optional[str],
+        typer.Argument(
+            ..., help="The date spent (in 'YY-MM-DD' format)", callback=_user_id
+        ),
+    ] = None,
+    amount: Annotated[
+        Optional[str],
+        typer.Argument(
+            ..., help="The amount spent in curreciless unit", callback=_user_id
+        ),
+    ] = None,
+    category: Annotated[
+        Optional[str], typer.Argument(..., help="Category name", callback=_user_id)
+    ] = None,
+    user: Annotated[
+        Optional[str], typer.Argument(..., help="User name", callback=_user_id)
+    ] = None,
+):
+    """Update existing transaction"""
+    data = {
+        "id": tx_id,
+        "date": date,
+        "amount": amount,
+        "category": category,
+        "user": user,
+    }
+
+    clean_data = {k: v for k, v in data.items() if v is not None}
+
+    status_code = database.update(models.Transaction, clean_data)
+    if status_code != 0:
+        typer.secho(
+            f"Transaction can't be updated. Error: {ERRORS[status_code]}",
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(1)
+    else:
+        typer.secho(f"Transaction ID '{tx_id}' has been updated", fg=typer.colors.GREEN)
 
 
 @app.command()

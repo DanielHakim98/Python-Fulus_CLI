@@ -2,7 +2,6 @@ import pytest
 from datetime import datetime
 from config import Config
 from fulus_cli.cli import main, transactions
-from fulus_cli.cli.transactions import _user_id
 from typer.testing import CliRunner
 from fulus_cli.sql_orm import db, models
 
@@ -92,3 +91,21 @@ class TestTransaction:
         print("Result stdout:", result.stdout)
         assert result.exit_code == 0
         assert f"Transaction ID '{tx_id}' has been removed" in result.stdout
+
+    def test_update_transactions(self, monkeypatch):
+        tx_id = "100"
+        amount = "1000"
+
+        def mocked_update(self, mocked_obj, id):
+            return 0
+
+        monkeypatch.setattr(db.DBConnection, "update", mocked_update)
+        result = runner.invoke(
+            main.app,
+            ["transactions", "update", tx_id, "--amount", amount],
+            env={"SQLALCHEMY_DATABASE_URI": TestTransaction.db_path},
+        )
+        print("Exit code:", result.exit_code)
+        print("Result stdout:", result.stdout)
+        assert result.exit_code == 0
+        assert f"Transaction ID '{tx_id}' has been updated" in result.stdout
