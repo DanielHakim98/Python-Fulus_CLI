@@ -1,5 +1,5 @@
 import sqlalchemy as sql
-from sqlalchemy import select, delete, exists, Sequence
+from sqlalchemy import select, delete, update, exists, Sequence
 from sqlalchemy.orm import Session
 from fulus_cli import SUCCESS, DB_WRITE_ERR, DB_READ_ERR
 from fulus_cli.sql_orm import models
@@ -46,7 +46,7 @@ class DBConnection:
         try:
             # Validate id exists within databse
             exists_query = select(exists().where(model_obj.id == model_obj.id))
-            result = session.execute(exists_query).scalar()
+            result = self.session.execute(exists_query).scalar()
             if bool(result) is False:
                 return DB_WRITE_ERR
 
@@ -58,12 +58,24 @@ class DBConnection:
         except Exception as e:
             return DB_WRITE_ERR
 
-    def update(self, model_obj) -> int:
+    def update(self, model_obj, values_with_id: dict[any, any]) -> int:
         try:
+            exists_query = select(
+                exists().where(model_obj.id == int(values_with_id["id"]))
+            )
+            result = self.session.execute(exists_query).scalar()
+            if bool(result) is False:
+                return DB_WRITE_ERR
+
+            stmt = update(model_obj)
             with self.session as session:
-                session.merge(model_obj)
+                session.execute(
+                    stmt,
+                    [values_with_id],
+                )
                 session.commit()
             return SUCCESS
+
         except Exception as e:
             return DB_WRITE_ERR
 
