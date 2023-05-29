@@ -88,17 +88,31 @@ def create(
 
 
 @app.command()
-def delete(tx_id: str = typer.Argument(..., help="The id of the transactions")):
-    """Remove existing transaction"""
-    status_code = database.delete(models.Transaction, tx_id)
+def list():
+    """List all transactions"""
+    result, status_code = database.read(models.Transaction)
     if status_code != 0:
         typer.secho(
-            f"Transaction can't be removed. Error: {ERRORS[status_code]}",
+            f"Failed while retriveing users. Error: {ERRORS[status_code]}",
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
     else:
-        typer.secho(f"Transaction ID '{tx_id}' has been removed", fg=typer.colors.GREEN)
+        typer.secho("--------------------------------------------")
+        typer.secho("id | date | amount | category_id | user_id | ")
+        typer.secho("--------------------------------------------")
+        for row in result:
+            typer.secho(
+                " | ".join(
+                    [
+                        str(row.id),
+                        row.date.strftime("%Y-%m-%d"),
+                        str(row.amount),
+                        str(row.category_id),
+                        str(row.user_id),
+                    ]
+                )
+            )
 
 
 @app.command()
@@ -132,6 +146,7 @@ def update(
         "user": user,
     }
 
+    # To allow optional and variadic arguments for multi update operations
     clean_data = {k: v for k, v in data.items() if v is not None}
 
     status_code = database.update(models.Transaction, clean_data)
@@ -146,31 +161,17 @@ def update(
 
 
 @app.command()
-def list():
-    """List all transactions"""
-    result, status_code = database.read(models.Transaction)
+def delete(tx_id: str = typer.Argument(..., help="The id of the transactions")):
+    """Remove existing transaction"""
+    status_code = database.delete(models.Transaction, tx_id)
     if status_code != 0:
         typer.secho(
-            f"Failed while retriveing users. Error: {ERRORS[status_code]}",
+            f"Transaction can't be removed. Error: {ERRORS[status_code]}",
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
     else:
-        typer.secho("--------------------------------------------")
-        typer.secho("id | date | amount | category_id | user_id | ")
-        typer.secho("--------------------------------------------")
-        for row in result:
-            typer.secho(
-                " | ".join(
-                    [
-                        str(row.id),
-                        row.date.strftime("%Y-%m-%d"),
-                        str(row.amount),
-                        str(row.category_id),
-                        str(row.user_id),
-                    ]
-                )
-            )
+        typer.secho(f"Transaction ID '{tx_id}' has been removed", fg=typer.colors.GREEN)
 
 
 if __name__ == "__main__":
