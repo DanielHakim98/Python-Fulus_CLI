@@ -3,7 +3,7 @@ import datetime
 from typing import Annotated, Optional
 import typer
 import re
-from config import Config
+from fulus_cli.config import Config
 from fulus_cli import ERRORS
 from fulus_cli.sql_orm import db, models
 from fulus_cli.sql_orm.models import convert_to_datetime as to_dt
@@ -93,7 +93,7 @@ def list():
     result, status_code = database.read(models.Transaction)
     if status_code != 0:
         typer.secho(
-            f"Failed while retriveing users. Error: {ERRORS[status_code]}",
+            f"Failed while retriveing transactions. Error: {ERRORS[status_code]}",
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)

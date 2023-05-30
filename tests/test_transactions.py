@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-from config import Config
+from fulus_cli.config import Config
 from fulus_cli.cli import main, transactions
 from typer.testing import CliRunner
 from fulus_cli.sql_orm import db, models

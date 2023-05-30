@@ -1,7 +1,7 @@
 """CLI commands for 'Users'"""
 import typer
 import re
-from config import Config
+from fulus_cli.config import Config
 from fulus_cli import __app_name__, __version__, ERRORS
 from fulus_cli.sql_orm import db, models
 
