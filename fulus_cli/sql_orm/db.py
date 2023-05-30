@@ -1,3 +1,5 @@
+import alembic.config
+from alembic import command
 import sqlalchemy as sql
 from sqlalchemy import select, delete, update, exists, Sequence
 from sqlalchemy.orm import Session
@@ -82,9 +84,15 @@ class DBConnection:
 
 def init_database(db_path: str) -> int:
     """Create a new financial manager database"""
+
     try:
-        engine = sql.create_engine(db_path)
-        models.Base.metadata.create_all(engine)
+        # Run Alembic migrations
+        alembic_cfg = alembic.config.Config("alembic.ini")
+        alembic_cfg.set_main_option("sqlalchemy.url", db_path)
+        command.init(alembic_cfg, directory="migration")
+        command.revision(alembic_cfg, autogenerate=True, message="Initial migration")
+        command.upgrade(alembic_cfg, "head")
+
         return SUCCESS
     except Exception as e:
         return DB_WRITE_ERR
