@@ -89,8 +89,6 @@ def init_database(db_path: str) -> int:
         # Run Alembic migrations
         alembic_cfg = alembic.config.Config("alembic.ini")
         alembic_cfg.set_main_option("sqlalchemy.url", db_path)
-        command.init(alembic_cfg, directory="migration")
-        command.revision(alembic_cfg, autogenerate=True, message="Initial migration")
         command.upgrade(alembic_cfg, "head")
 
         return SUCCESS

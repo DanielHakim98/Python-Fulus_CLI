@@ -31,13 +31,13 @@ def main(
     return
 
 
-# @app.command()
+@app.command()
 def init(
     db_path: str = typer.Option(
         Config.SQLALCHEMY_DATABASE_URI,
         "--db-path",
         "-db",
-        prompt="Use default database location? Tap [Enter] to use default location. Otherwise, enter custom location.\n",
+        prompt=" Are you sure to initialize a database?\n Tap [Enter] to use default location.\n",
     )
 ) -> None:
     """Initialize the to-do database."""
@@ -49,5 +49,4 @@ def init(
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    else:
-        typer.secho(f"The finance cli database is {db_path}", fg=typer.colors.GREEN)
+    typer.secho(f"The finance cli database is {db_path}", fg=typer.colors.GREEN)
