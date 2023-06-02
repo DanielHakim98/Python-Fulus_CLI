@@ -37,8 +37,7 @@ def create(
             f"User can't be created. Error: {ERRORS[status_code]}", fg=typer.colors.RED
         )
         raise typer.Exit(1)
-    else:
-        typer.secho(f"User '{username}' has been created", fg=typer.colors.GREEN)
+    typer.secho(f"User '{username}' has been created", fg=typer.colors.GREEN)
 
 
 @app.command()
@@ -51,12 +50,11 @@ def list() -> None:
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    else:
-        typer.secho("------------------")
-        typer.secho("id | name | email")
-        typer.secho("------------------")
-        for row in result:
-            typer.secho(" | ".join([str(row.id), row.name, row.email]))
+    typer.secho("------------------")
+    typer.secho("id | name | email")
+    typer.secho("------------------")
+    for row in result:
+        typer.secho(" | ".join([str(row.id), row.name, row.email]))
 
 
 @app.command()
@@ -72,7 +70,7 @@ def delete(
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    elif len(user) < 1:
+    if len(user) < 1:
         typer.secho("User does not exist", fg=typer.colors.RED)
     user_id = user[0].id
 
@@ -82,8 +80,7 @@ def delete(
             f"User can't be removed. Error: {ERRORS[status_code]}", fg=typer.colors.RED
         )
         raise typer.Exit(1)
-    else:
-        typer.secho(f"User '{username}' has been removed", fg=typer.colors.GREEN)
+    typer.secho(f"User '{username}' has been removed", fg=typer.colors.GREEN)
 
 
 if __name__ == "__main__":
