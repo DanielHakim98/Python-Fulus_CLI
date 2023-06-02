@@ -39,7 +39,7 @@ def _category_id(category: str) -> int:
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    elif len(category_list) < 1:
+    if len(category_list) < 1:
         typer.secho(f"Category does not exist", fg=typer.colors.RED)
         raise typer.Exit(1)
     return category_list[0].id
@@ -53,7 +53,7 @@ def _user_id(user: str) -> int:
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    elif len(user_list) < 1:
+    if len(user_list) < 1:
         typer.secho(f"User does not exist", fg=typer.colors.RED)
         raise typer.Exit(1)
     return user_list[0].id
@@ -83,8 +83,7 @@ def create(
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    else:
-        typer.secho(f"Transaction has been inserted.", fg=typer.colors.GREEN)
+    typer.secho(f"Transaction has been inserted.", fg=typer.colors.GREEN)
 
 
 @app.command()
@@ -97,22 +96,21 @@ def list():
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    else:
-        typer.secho("--------------------------------------------")
-        typer.secho("id | date | amount | category_id | user_id | ")
-        typer.secho("--------------------------------------------")
-        for row in result:
-            typer.secho(
-                " | ".join(
-                    [
-                        str(row.id),
-                        row.date.strftime("%Y-%m-%d"),
-                        str(row.amount),
-                        str(row.category_id),
-                        str(row.user_id),
-                    ]
-                )
+    typer.secho("--------------------------------------------")
+    typer.secho("id | date | amount | category_id | user_id | ")
+    typer.secho("--------------------------------------------")
+    for row in result:
+        typer.secho(
+            " | ".join(
+                [
+                    str(row.id),
+                    row.date.strftime("%Y-%m-%d"),
+                    str(row.amount),
+                    str(row.category_id),
+                    str(row.user_id),
+                ]
             )
+        )
 
 
 @app.command()
@@ -156,8 +154,7 @@ def update(
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    else:
-        typer.secho(f"Transaction ID '{tx_id}' has been updated", fg=typer.colors.GREEN)
+    typer.secho(f"Transaction ID '{tx_id}' has been updated", fg=typer.colors.GREEN)
 
 
 @app.command()
@@ -170,8 +167,7 @@ def delete(tx_id: str = typer.Argument(..., help="The id of the transactions")):
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    else:
-        typer.secho(f"Transaction ID '{tx_id}' has been removed", fg=typer.colors.GREEN)
+    typer.secho(f"Transaction ID '{tx_id}' has been removed", fg=typer.colors.GREEN)
 
 
 if __name__ == "__main__":
