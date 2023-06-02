@@ -1,13 +1,14 @@
 import typer
 from fulus_cli.config import Config
 from typing import Optional
-from fulus_cli.cli import app
 from fulus_cli.sql_orm import db
 from fulus_cli import (
     __app_name__,
     __version__,
     ERRORS,
 )
+
+app = typer.Typer()
 
 
 def _version_callback(value: bool) -> None:
@@ -30,7 +31,7 @@ def main(
     return
 
 
-@app.command()
+# @app.command()
 def init(
     db_path: str = typer.Option(
         Config.SQLALCHEMY_DATABASE_URI,
