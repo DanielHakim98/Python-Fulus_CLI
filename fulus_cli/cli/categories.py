@@ -30,8 +30,7 @@ def create(title: str = typer.Argument(..., help="The name of the category")) ->
             f"Category creation failed. Error {ERRORS[status_code]}",
             fg=typer.colors.RED,
         )
-    else:
-        typer.secho(f"Category '{title}' has been added", fg=typer.colors.GREEN)
+    typer.secho(f"Category '{title}' has been added", fg=typer.colors.GREEN)
 
 
 @app.command()
@@ -44,12 +43,11 @@ def list() -> None:
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    else:
-        typer.secho("------------")
-        typer.secho("id | title ")
-        typer.secho("------------")
-        for row in result:
-            typer.secho(" | ".join([str(row.id), row.title]))
+    typer.secho("------------")
+    typer.secho("id | title ")
+    typer.secho("------------")
+    for row in result:
+        typer.secho(" | ".join([str(row.id), row.title]))
 
 
 @app.command()
@@ -81,10 +79,7 @@ def update(
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    else:
-        typer.secho(
-            f"Category ID '{category_id}' has been updated", fg=typer.colors.GREEN
-        )
+    typer.secho(f"Category ID '{category_id}' has been updated", fg=typer.colors.GREEN)
 
 
 @app.command()
@@ -98,7 +93,7 @@ def delete(title: str = typer.Argument(..., help="The name of the category")) ->
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    elif len(category) < 1:
+    if len(category) < 1:
         typer.secho("Category does not exist", fg=typer.colors.RED)
     category_id = category[0].id
 
@@ -109,8 +104,7 @@ def delete(title: str = typer.Argument(..., help="The name of the category")) ->
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
-    else:
-        typer.secho(f"Category '{title}' has been removed", fg=typer.colors.GREEN)
+    typer.secho(f"Category '{title}' has been removed", fg=typer.colors.GREEN)
 
 
 if __name__ == "__main__":
