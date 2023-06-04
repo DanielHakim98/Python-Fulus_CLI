@@ -3,6 +3,7 @@ import datetime
 from typing import Annotated, Optional
 import typer
 import re
+from collections.abc import Callable
 from fulus_cli.config import Config
 from fulus_cli import ERRORS
 from fulus_cli.sql_orm import db, models
@@ -10,6 +11,12 @@ from fulus_cli.sql_orm.models import convert_to_datetime as to_dt
 
 app = typer.Typer()
 database = db.DBConnection(Config.SQLALCHEMY_DATABASE_URI)
+
+
+def check_none(value: str, function: Callable[[str], any]):
+    if value is None:
+        return value
+    return function(value)
 
 
 def _validate_date(date: str) -> datetime.datetime:
@@ -116,24 +123,30 @@ def list():
 @app.command()
 def update(
     tx_id: str = typer.Argument(..., help="The id of the transactions"),
-    date: Annotated[
-        Optional[str],
-        typer.Argument(
-            ..., help="The date spent (in 'YYYY-MM-DD' format)", callback=_user_id
-        ),
-    ] = None,
-    amount: Annotated[
-        Optional[str],
-        typer.Argument(
-            ..., help="The amount spent in curreciless unit", callback=_user_id
-        ),
-    ] = None,
-    category: Annotated[
-        Optional[str], typer.Argument(..., help="Category name", callback=_user_id)
-    ] = None,
-    user: Annotated[
-        Optional[str], typer.Argument(..., help="User name", callback=_user_id)
-    ] = None,
+    date: Optional[str] = typer.Option(
+        None,
+        "--date",
+        help="The date spent (in 'YYYY-MM-DD' format)",
+        callback=lambda value: check_none(value, _validate_date),
+    ),
+    amount: Optional[str] = typer.Option(
+        None,
+        "--amount",
+        help="The amount spent in curreciless unit",
+        callback=lambda value: check_none(value, _validate_amount),
+    ),
+    category: Optional[str] = typer.Option(
+        None,
+        "--category",
+        help="Category name",
+        callback=lambda value: check_none(value, _category_id),
+    ),
+    user: Optional[str] = typer.Option(
+        None,
+        "--user",
+        help="User name",
+        callback=lambda value: check_none(value, _user_id),
+    ),
 ):
     """Update existing transaction"""
     data = {
@@ -146,7 +159,6 @@ def update(
 
     # To allow optional and variadic arguments for multi update operations
     clean_data = {k: v for k, v in data.items() if v is not None}
-
     status_code = database.update(models.Transaction, clean_data)
     if status_code != 0:
         typer.secho(
