@@ -72,6 +72,7 @@ def delete(
         raise typer.Exit(1)
     if len(user) < 1:
         typer.secho("User does not exist", fg=typer.colors.RED)
+        raise typer.Exit(1)
     user_id = user[0].id
 
     status_code = database.delete(models.User, user_id)

@@ -95,6 +95,7 @@ def delete(title: str = typer.Argument(..., help="The name of the category")) ->
         raise typer.Exit(1)
     if len(category) < 1:
         typer.secho("Category does not exist", fg=typer.colors.RED)
+        raise typer.Exit(1)
     category_id = category[0].id
 
     status_code = database.delete(models.Category, category_id)
