@@ -47,9 +47,10 @@ class DBConnection:
     def delete(self, model_obj, id) -> int:
         try:
             # Validate id exists within databse
-            exists_query = select(exists().where(model_obj.id == model_obj.id))
+            exists_query = select(exists().where(model_obj.id == id))
             result = self.session.execute(exists_query).scalar()
             if bool(result) is False:
+                print("Transaction ID does not exist")
                 return DB_WRITE_ERR
 
             stmt = delete(model_obj).where(model_obj.id == id)

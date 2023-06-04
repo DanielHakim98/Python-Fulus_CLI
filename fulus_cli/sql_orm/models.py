@@ -1,23 +1,13 @@
 import re
 from fulus_cli import FILE_ERR
 from datetime import datetime
-from sqlalchemy.orm import (
-    DeclarativeBase,
-    Mapped,
-    mapped_column,
-    relationship
-)
-from sqlalchemy import (
-    Integer,
-    String,
-    Float,
-    DateTime,
-    ForeignKey,
-    UniqueConstraint
-)
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import Integer, String, Float, DateTime, ForeignKey, UniqueConstraint
+
 
 class Base(DeclarativeBase):
     pass
+
 
 class User(Base):
     __tablename__ = "transaction_user"
@@ -26,20 +16,22 @@ class User(Base):
     email: Mapped[str] = mapped_column(String)
 
     # note for myself:
-    #------------------
+    # ------------------
     # back_populates parameter takes column name of parent table that is referenced by other tables
     # example: 'Transaction' table has attributes 'user_id' that refers to 'User' table attribute 'id'.
     #          This means 'Transaction' table is a child table of 'User' table. Therefore, we need to define
     #          that any references of user_id in 'Transaction' table can be referenced back to 'User' table column id
 
-    transactions: Mapped[list["Transaction"] | None] = relationship(back_populates="user")
-
-    __table_args__ = (
-        UniqueConstraint('name', 'email', name='uq_user_name_email'),\
-        UniqueConstraint('name', name='uq_user_name')
+    transactions: Mapped[list["Transaction"] | None] = relationship(
+        back_populates="user"
     )
 
-    def __init__(self, name: str, email:str) -> None:
+    __table_args__ = (
+        UniqueConstraint("name", "email", name="uq_user_name_email"),
+        UniqueConstraint("name", name="uq_user_name"),
+    )
+
+    def __init__(self, name: str, email: str) -> None:
         self.name = name
         self.email = email
 
@@ -52,10 +44,11 @@ class Category(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String)
 
-    transactions: Mapped[list["Transaction"] | None] = relationship(back_populates="category")
-    __table_args__ = (
-        UniqueConstraint('title', name='uq_category_title'),
+    transactions: Mapped[list["Transaction"] | None] = relationship(
+        back_populates="category"
     )
+    __table_args__ = (UniqueConstraint("title", name="uq_category_title"),)
+
     def __init__(self, title: str) -> None:
         self.title = title
 
@@ -67,14 +60,20 @@ class Transaction(Base):
     __tablename__ = "transaction_master"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     date: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    amount: Mapped[float ]= mapped_column(Float, default = 0.0)
-    category_id: Mapped[int] = mapped_column(ForeignKey("transaction_category.id"), nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("transaction_user.id"), nullable=False)
+    amount: Mapped[float] = mapped_column(Float, default=0.0)
+    category_id: Mapped[int] = mapped_column(
+        ForeignKey("transaction_category.id"), nullable=False
+    )
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("transaction_user.id"), nullable=False
+    )
 
     category: Mapped[Category] = relationship(back_populates="transactions")
     user: Mapped[User] = relationship(back_populates="transactions")
 
-    def __init__(self, date: datetime, amount:float, category_id: int, user_id: int) -> None:
+    def __init__(
+        self, date: datetime, amount: float, category_id: int, user_id: int
+    ) -> None:
         self.date = date
         self.amount = amount
         self.category_id = category_id
@@ -89,8 +88,10 @@ class Transaction(Base):
             + f"user_id={self.user_id!r})"
         )
 
-def convert_to_datetime(date:str)-> datetime | int:
+
+def convert_to_datetime(date: str) -> datetime | int:
     pattern = r"^(19\d{2}|20[0-2][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
-    if re.match(pattern, date):
-        return datetime.strptime(date, '%Y-%m-%d'), 0
+    if date is not None and isinstance(date, str):
+        if re.match(pattern, date):
+            return datetime.strptime(date, "%Y-%m-%d"), 0
     return None, FILE_ERR
