@@ -119,7 +119,7 @@ def update(
     date: Annotated[
         Optional[str],
         typer.Argument(
-            ..., help="The date spent (in 'YY-MM-DD' format)", callback=_user_id
+            ..., help="The date spent (in 'YYYY-MM-DD' format)", callback=_user_id
         ),
     ] = None,
     amount: Annotated[
